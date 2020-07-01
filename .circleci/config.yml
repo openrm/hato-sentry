@@ -49,6 +49,7 @@ jobs:
       - image: node:13-alpine
     steps:
       - checkout
+      - *git
       - run:
           name: Install ESLint
           command: npm install --no-save eslint@^6.8.0
@@ -56,21 +57,6 @@ jobs:
       - run:
           name: Run ESLint
           command: make lint
-
-  typecheck:
-    docker:
-      - image: node:13-alpine
-    steps:
-      - checkout
-      - *restore
-      - *make
-      - run:
-          name: Install Dependencies
-          command: make deps
-      - *cache
-      - run:
-          name: Type Check
-          command: make types
 
   node8:
     docker:
@@ -102,74 +88,24 @@ jobs:
       - *rabbitmq
     <<: *test
 
-  coverage:
-    docker:
-      - image: node:13-alpine
-      - *rabbitmq
-    steps:
-      - checkout
-      - *restore
-      - *make
-      - run:
-          name: Install Dependencies
-          command: make deps
-      - *cache
-      - *wait
-      - run:
-          name: Run Tests & Calculate Coverage
-          command: make coverage
-
-      - persist_to_workspace:
-          root: coverage
-          paths:
-            - lcov.info
-
-  report_coverage:
-    docker:
-      - image: node:13-alpine
-    steps:
-      - run: apk add --no-cache git ca-certificates curl
-
-      - attach_workspace:
-          at: /tmp/coverage
-
-      - checkout
-
-      - run: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > reporter
-      - run: chmod +x reporter
-      - run: ./reporter format-coverage -t lcov /tmp/coverage/lcov.info -o codeclimate.json
-      - run: ./reporter upload-coverage -i codeclimate.json
-
 workflows:
   version: 2
   build:
     jobs:
       - lint
-      - typecheck
       - node8:
           requires:
             - lint
-            - typecheck
       - node10:
           requires:
             - lint
-            - typecheck
       - node11:
           requires:
             - lint
-            - typecheck
       - node12:
           requires:
             - lint
-            - typecheck
       - node14:
           requires:
             - lint
-            - typecheck
-      - coverage:
-          requires:
-            - lint
-            - typecheck
-      - report_coverage:
-          requires:
-            - coverage
+

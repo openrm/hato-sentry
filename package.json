@@ -25,7 +25,6 @@
     "hato": "git+https://github.com/openrm/hato.git",
     "mocha": "^8.0.1",
     "nyc": "^15.1.0",
-    "sinon": "^9.0.2",
-    "tsc": "^1.20150623.0"
+    "sinon": "^9.0.2"
   }
 }
