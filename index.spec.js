@@ -38,6 +38,10 @@ describe('Sentry', function() {
 
         await client.publish('it.always.fails', { hello: 'world' });
 
+        await new Promise((resolve) => {
+            setTimeout(resolve, 500);
+        });
+
         assert(spyScope.calledOnce);
         assert(spyReport.calledOnce);
     });
@@ -65,6 +69,10 @@ describe('Sentry', function() {
 
 
         await client.rpc('it.always.fails', { hello: 'world' }).catch(() => {});
+
+        await new Promise((resolve) => {
+            setTimeout(resolve, 500);
+        });
 
         assert(spyScope.calledOnce);
         assert(spyReport.calledOnce);
