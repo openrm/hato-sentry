@@ -18,6 +18,11 @@ make: &make
     name: Install GNU Make
     command: apk add make --no-cache
 
+git: &git
+  run:
+    name: Install Git and certificates
+    command: apk add ca-certificates git --no-cache
+
 wait: &wait
   run:
     name: Wait For RabbitMQ To Start
@@ -28,6 +33,7 @@ test: &test
     - checkout
     - *restore
     - *make
+    - *git
     - run:
         name: Install Dependencies
         command: make deps
