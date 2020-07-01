@@ -6,18 +6,27 @@ const { Encoding, Retry, RPC } = require('hato/plugins');
 
 const Sentry = require('@sentry/node');
 
-const plugin = require('./index');
+const plugin = require('.');
 
-describe('Sentry', function() {
+describe('Sentry plugin', function() {
     let client = null;
     const sandbox = sinon.createSandbox();
 
     afterEach(() => {
         sandbox.restore();
-        return client.close();
+        return client && client.close();
     });
 
-    it('Should report any error to Sentry', async function() {
+    it('should reject if Sentry access point is not provided', () => {
+        assert.throws(
+            () => new Client('amqp://guest:guest@127.0.0.1:5672', {
+                plugins: [new plugin({ Sentry: null })]
+            }),
+            assert.AssertionError
+        );
+    });
+
+    it('should report any error to Sentry', async function() {
         client = new Client('amqp://guest:guest@127.0.0.1:5672', {
             plugins: [
                 new Encoding('json'),
@@ -29,29 +38,26 @@ describe('Sentry', function() {
 
         const spyScope = sandbox.spy(Sentry, 'withScope');
         const spyReport = sandbox.spy(Sentry, 'captureException');
+        const spyHandler = sandbox.fake.throws(
+            new Error('My route somehow have uncaught exception :('));
 
 
-        await client.subscribe('it.always.fails', () => {
-            throw new Error('My route somehow have uncaught exception :(');
-        });
+        await client.subscribe('it.always.fails', spyHandler);
 
 
         await client.publish('it.always.fails', { hello: 'world' });
 
-        await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-        });
-
+        assert(spyHandler.calledOnce);
         assert(spyScope.calledOnce);
         assert(spyReport.calledOnce);
     });
 
-    it('Should report any error to Sentry (retry)', async function() {
-        this.timeout(4000);
+    it('should report any error to Sentry (retry)', async function() {
+        const retries = 3;
 
         client = new Client('amqp://guest:guest@127.0.0.1:5672', {
             plugins: [
-                new Retry(),
+                new Retry({ min: 5, retries, strategy: 'constant' }),
                 new RPC(),
                 new Encoding('json'),
                 new plugin({ Sentry })
@@ -62,18 +68,14 @@ describe('Sentry', function() {
 
         const spyScope = sandbox.spy(Sentry, 'withScope');
         const spyReport = sandbox.spy(Sentry, 'captureException');
+        const spyHandler = sandbox.fake.throws(
+            new Error('My route somehow have uncaught exception :('));
 
-        await client.subscribe('it.always.fails', () => {
-            throw new Error('My route somehow have uncaught exception :(');
-        });
-
+        await client.subscribe('it.always.fails', spyHandler);
 
         await client.rpc('it.always.fails', { hello: 'world' }).catch(() => {});
 
-        await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-        });
-
+        assert.strictEqual(spyHandler.callCount, retries + 1);
         assert(spyScope.calledOnce);
         assert(spyReport.calledOnce);
     });
