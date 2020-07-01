@@ -1,6 +1,6 @@
 {
   "name": "hato-sentry",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -17,14 +17,15 @@
   },
   "homepage": "https://github.com/openrm/node-hato-sentry#readme",
   "peerDependencies": {
-    "hato": "git+https://github.com/openrm/hato.git"
+    "hato": "^0.0.1"
   },
   "devDependencies": {
     "@sentry/node": "^5.18.1",
-    "hato": "git+https://github.com/openrm/hato.git",
     "eslint": "^6.8.0",
+    "hato": "0.0.1",
     "mocha": "^7.1.2",
     "nyc": "^15.0.1",
     "sinon": "^9.0.2"
-  }
+  },
+  "dependencies": {}
 }
