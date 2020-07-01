@@ -8,6 +8,12 @@ const Sentry = require('@sentry/node');
 
 const plugin = require('.');
 
+const createTrigger = (times = 1) => {
+    let c = 0, inc, completed = new Promise(
+        (resolve) => inc = () => ++c >= times && resolve());
+    return { inc, completed };
+};
+
 describe('Sentry plugin', function() {
     let client = null;
     const sandbox = sinon.createSandbox();
@@ -38,16 +44,18 @@ describe('Sentry plugin', function() {
 
         const spyScope = sandbox.spy(Sentry, 'withScope');
         const spyReport = sandbox.spy(Sentry, 'captureException');
-        const spyHandler = sandbox.fake.throws(
-            new Error('My route somehow have uncaught exception :('));
 
+        const { inc, completed } = createTrigger();
 
-        await client.subscribe('it.always.fails', spyHandler);
-
+        await client.subscribe('it.always.fails', () => {
+            inc();
+            throw new Error('My route somehow have uncaught exception :(');
+        });
 
         await client.publish('it.always.fails', { hello: 'world' });
 
-        assert(spyHandler.calledOnce);
+        await completed;
+
         assert(spyScope.calledOnce);
         assert(spyReport.calledOnce);
     });
@@ -68,14 +76,18 @@ describe('Sentry plugin', function() {
 
         const spyScope = sandbox.spy(Sentry, 'withScope');
         const spyReport = sandbox.spy(Sentry, 'captureException');
-        const spyHandler = sandbox.fake.throws(
-            new Error('My route somehow have uncaught exception :('));
 
-        await client.subscribe('it.always.fails', spyHandler);
+        const { inc, completed } = createTrigger(retries + 1);
+
+        await client.subscribe('it.always.fails', () => {
+            inc();
+            throw new Error('My route somehow have uncaught exception :(');
+        });
 
         await client.rpc('it.always.fails', { hello: 'world' }).catch(() => {});
 
-        assert.strictEqual(spyHandler.callCount, retries + 1);
+        await completed;
+
         assert(spyScope.calledOnce);
         assert(spyReport.calledOnce);
     });
