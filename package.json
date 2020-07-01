@@ -1,0 +1,31 @@
+{
+  "name": "hato-sentry",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openrm/node-hato-sentry.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/openrm/node-hato-sentry/issues"
+  },
+  "homepage": "https://github.com/openrm/node-hato-sentry#readme",
+  "peerDependencies": {
+    "hato": "git+https://github.com/openrm/hato.git"
+  },
+  "devDependencies": {
+    "@sentry/node": "^5.18.1",
+    "eslint": "^7.3.1",
+    "hato": "git+https://github.com/openrm/hato.git",
+    "mocha": "^8.0.1",
+    "nyc": "^15.1.0",
+    "sinon": "^9.0.2",
+    "tsc": "^1.20150623.0"
+  }
+}
