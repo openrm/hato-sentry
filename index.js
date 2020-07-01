@@ -26,13 +26,9 @@ module.exports = class extends Plugin {
                 return super.consume(queue, fn, options)
                     .on('error', (err, msg) => {
                         plugin.Sentry.withScope((scope) => {
+                            scope.setLevel('error');
                             try {
-                                scope.setTag('exchange', msg.fields.exchange);
-                                scope.setTag('routing_key', msg.fields.routingKey);
-
-                                const content = Buffer.isBuffer(msg.content) ?
-                                    msg.content.toString() : msg.content;
-                                scope.setContext('message', { ...msg, content });
+                                plugin.addData(scope, msg);
                             } finally {
                                 plugin.Sentry.captureException(err);
                             }
@@ -41,6 +37,21 @@ module.exports = class extends Plugin {
             }
 
         };
+    }
+
+    addData(scope, msg) {
+        const {
+            fields,
+            properties
+        } = msg;
+
+        scope.setTag('exchange', fields.exchange);
+        scope.setTag('routing_key', fields.routingKey);
+
+        const content = Buffer.isBuffer(msg.content) ?
+            msg.content.toString() : msg.content;
+
+        scope.setContext('message', { fields, content, properties });
     }
 
 };
