@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openrm/node-hato-sentry.git"
+    "url": "git+https://github.com/openrm/hato-sentry.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/openrm/node-hato-sentry/issues"
+    "url": "https://github.com/openrm/hato-sentry/issues"
   },
-  "homepage": "https://github.com/openrm/node-hato-sentry#readme",
+  "homepage": "https://github.com/openrm/hato-sentry#readme",
   "peerDependencies": {
     "hato": "git+https://github.com/openrm/hato.git"
   },
