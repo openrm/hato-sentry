@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/openrm/hato-sentry#readme",
   "peerDependencies": {
-    "hato": "^0.0.1"
+    "hato": "~0.0.1"
   },
   "devDependencies": {
     "@sentry/node": "^5.18.1",
