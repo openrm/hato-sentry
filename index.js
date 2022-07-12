@@ -47,6 +47,8 @@ module.exports = class extends Plugin {
 
         scope.setTag('exchange', fields.exchange);
         scope.setTag('routing_key', fields.routingKey);
+        scope.setTag('redelivered', fields.redelivered);
+        scope.setTag('consumer_tag', fields.consumerTag);
 
         const content = Buffer.isBuffer(msg.content) ?
             msg.content.toString() : msg.content;
