@@ -1,12 +1,9 @@
 import hato from 'hato';
 import Sentry from '@sentry/node';
 
-export as namespace SentryPlugin
+export as namespace hatoSentry;
 
-type Sentry = typeof Sentry
+type Options = { Sentry: typeof Sentry };
+declare const Plugin: hato.Plugins.Plugin<Options>;
 
-declare class SentryPlugin extends hato.Plugin {
-    constructor({ Sentry }: { Sentry: Sentry })
-}
-
-export = SentryPlugin;
+export = Plugin;
