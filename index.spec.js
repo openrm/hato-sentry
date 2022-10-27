@@ -88,7 +88,7 @@ describe('Sentry plugin', function() {
 
         await completed;
 
-        assert(spyScope.calledOnce);
-        assert(spyReport.calledOnce);
+        assert.strictEqual(spyScope.callCount, retries + 1);
+        assert.strictEqual(spyReport.callCount, retries + 1);
     });
 });
