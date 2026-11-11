@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 rabbitmq: &rabbitmq
   image: rabbitmq:3-alpine
